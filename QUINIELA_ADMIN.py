@@ -169,7 +169,7 @@ def conectar_google_sheets():
         st.error(f"Error crítico en conexión Google Sheets: {e}")
         return None
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=50)
 def obtener_datos_jornada_cache(jornada_nombre):
     spreadsheet = conectar_google_sheets()
     if not spreadsheet:
@@ -306,6 +306,15 @@ def obtener_jornada_actual():
 jornada_automatica = obtener_jornada_actual()
 st.sidebar.markdown(f"📅 **Fecha:** `{datetime.now().strftime('%d/%m/%Y')}`")
 st.sidebar.markdown(f"⚽ **Jornada Sugerida:** `{jornada_automatica}`")
+st.sidebar.markdown("---")
+
+# --- BOTÓN DE ACTUALIZACIÓN MANUAL DE DATOS ---
+if st.sidebar.button("🔄 Actualizar Datos", type="primary", use_container_width=True):
+    st.cache_data.clear()
+    st.cache_resource.clear()
+    st.success("¡Datos sincronizados con éxito!")
+    st.rerun()
+
 st.sidebar.markdown("---")
 
 # =========================================================================
