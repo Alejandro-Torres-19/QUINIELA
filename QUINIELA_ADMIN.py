@@ -14,7 +14,7 @@ st.set_page_config(
     layout="wide",
 )
 
-# --- ESTILOS CSS VIBRANTES Y MODERNOS (CON CORRECCIÓN DE SELECTBOX BLANCO) ---
+# --- ESTILOS CSS VIBRANTES Y MODERNOS (CORRECCIÓN DE PESTAÑAS Y SELECTBOX) ---
 st.markdown("""
     <style>
         /* Fondo general de la aplicación */
@@ -46,15 +46,7 @@ st.markdown("""
             color: #ffffff !important;
         }
 
-        /* Color de las etiquetas de texto/badges en la barra lateral */
-        div[data-testid="stSidebar"] code, 
-        [data-testid="stMarkdownContainer"] code {
-            background-color: #1e1b4b !important;
-            color: #c084fc !important;
-            border: 1px solid #6366f1 !important;
-        }
-
-        /* Estilo de pestañas (Tabs) grandes, coloridas y con efecto glow */
+        /* Estilo de pestañas (Tabs) grandes, coloridas y texto blanco visible */
         .stTabs [data-baseweb="tab-list"] {
             gap: 8px;
             background-color: rgba(30, 27, 75, 0.5);
@@ -64,10 +56,10 @@ st.markdown("""
         }
         
         .stTabs [data-baseweb="tab"] {
-            background-color: rgba(15, 23, 42, 0.6);
+            background-color: rgba(15, 23, 42, 0.8);
             border-radius: 10px;
             padding: 12px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
         }
 
@@ -76,10 +68,14 @@ st.markdown("""
             border-color: #a855f7;
         }
 
-        .stTabs [data-baseweb="tab"] p {
+        /* FORZAR TEXTO BLANCO BRILLANTE EN LOS TÍTULOS DE LAS PESTAÑAS */
+        .stTabs [data-baseweb="tab"] p, 
+        .stTabs [data-baseweb="tab"] span,
+        .stTabs div[data-baseweb="tab"] div {
             font-size: 1.15rem !important;
             font-weight: 800 !important;
             color: #ffffff !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
 
         /* Botones principales llamativos con degradado */
