@@ -1,0 +1,7 @@
+[theme]
+primaryColor = "#10B981"          # Color verde esmeralda (ideal para resaltar el puesto #1)
+backgroundColor = "#0E1117"       # Fondo oscuro principal
+secondaryBackgroundColor = "#1F2937" # Fondo de tarjetas y barras laterales
+textColor = "#FFFFFF"             # Color del texto principal
+font = "sans serif"
+base = "dark"
