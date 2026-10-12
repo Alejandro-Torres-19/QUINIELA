@@ -14,7 +14,7 @@ st.set_page_config(
     layout="wide",
 )
 
-# --- SELECTOR MANUAL DE MODO EN LA BARRA LATERAL ---
+# --- BARRA LATERAL Y SELECTOR DE TEMA (MODO CLARO POR DEFECTO) ---
 st.sidebar.image("assets/logo_liga.png", width=380)
 st.sidebar.markdown("""
     <div style="background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%); padding: 10px 15px; border-radius: 10px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);">
@@ -22,11 +22,11 @@ st.sidebar.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Selector visual manual para el usuario
-modo_visual = st.sidebar.radio("🎨 Tema Visual de la App:", ["🌙 Oscuro (Default)", "☀️ Claro"], horizontal=True)
+# Selector visual manual (Predeterminado: Claro [index=1])
+modo_visual = st.sidebar.radio("🎨 Tema Visual de la App:", ["🌙 Oscuro", "☀️ Claro (Default)"], index=1, horizontal=True)
 is_dark = "Oscuro" in modo_visual
 
-# --- DEFINICIÓN DE COLORES SEGÚN EL MODO SELECCIONADO ---
+# --- DEFINICIÓN DE COLORES SEGÚN EL TEMA SELECCIONADO ---
 if is_dark:
     bg_app = "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)"
     text_color = "#f8fafc"
@@ -34,15 +34,17 @@ if is_dark:
     input_bg = "#1e293b"
     tab_text = "#ffffff"
     sidebar_bg = "linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%)"
+    border_color = "#6366f1"
 else:
-    bg_app = "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%)"
+    bg_app = "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%)"
     text_color = "#0f172a"
-    card_bg = "rgba(255, 255, 255, 0.9)"
+    card_bg = "rgba(255, 255, 255, 0.95)"
     input_bg = "#ffffff"
     tab_text = "#1e1b4b"
-    sidebar_bg = "linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%)"
+    sidebar_bg = "linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%)"
+    border_color = "#cbd5e1"
 
-# --- ESTILOS CSS DINÁMICOS DEPENDIENTES DEL SELECTOR ---
+# --- ESTILOS CSS DINÁMICOS ---
 st.markdown(f"""
     <style>
         /* Fondo general de la aplicación */
@@ -51,20 +53,20 @@ st.markdown(f"""
             color: {text_color} !important;
         }}
 
-        /* Barra lateral */
+        /* Barra lateral limpia y única */
         [data-testid="stSidebar"] {{
             min-width: 320px !important;
             max-width: 320px !important;
             background: {sidebar_bg} !important;
-            border-right: 2px solid rgba(99, 102, 241, 0.3);
+            border-right: 2px solid rgba(99, 102, 241, 0.2);
         }}
 
-        /* Campos Selectbox */
+        /* Campos Selectbox / Menú desplegable */
         div[data-baseweb="select"] > div, 
         .stSelectbox div[data-baseweb="select"] {{
             background-color: {input_bg} !important;
             color: {text_color} !important;
-            border: 1.5px solid #6366f1 !important;
+            border: 1.5px solid {border_color} !important;
             border-radius: 10px !important;
         }}
 
@@ -73,10 +75,10 @@ st.markdown(f"""
             color: {text_color} !important;
         }}
 
-        /* Pestañas (Tabs) y sus textos visibles */
+        /* Estilo de pestañas (Tabs) */
         .stTabs [data-baseweb="tab-list"] {{
             gap: 8px;
-            background-color: rgba(30, 27, 75, 0.2);
+            background-color: rgba(99, 102, 241, 0.1);
             padding: 10px;
             border-radius: 16px;
             border: 1px solid rgba(99, 102, 241, 0.2);
@@ -86,15 +88,20 @@ st.markdown(f"""
             background-color: {card_bg} !important;
             border-radius: 10px;
             padding: 12px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid {border_color};
             transition: all 0.3s ease;
         }}
 
         .stTabs [data-baseweb="tab"]:hover {{
             background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%) !important;
         }}
+        
+        .stTabs [data-baseweb="tab"]:hover p,
+        .stTabs [data-baseweb="tab"]:hover span {{
+            color: #ffffff !important;
+        }}
 
-        /* FORZAR TEXTO CLARO/OSCURO EN LAS PESTAÑAS SEGÚN EL MODO */
+        /* Texto de los títulos de las pestañas */
         .stTabs [data-baseweb="tab"] p, 
         .stTabs [data-baseweb="tab"] span,
         .stTabs div[data-baseweb="tab"] div {{
@@ -103,11 +110,30 @@ st.markdown(f"""
             color: {tab_text} !important;
         }}
 
+        /* Botones principales */
+        div.stButton > button[kind="primary"] {{
+            background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%) !important;
+            color: white !important;
+            font-size: 1.15rem !important;
+            font-weight: 800 !important;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 12px !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+        }}
+
+        div.stButton > button[kind="primary"]:hover {{
+            background: linear-gradient(135deg, #4f46e5 0%, #db2777 100%) !important;
+            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.6);
+            transform: translateY(-2px);
+        }}
+
         /* Inputs de texto */
         .stTextInput input {{
             background-color: {input_bg} !important;
             border-radius: 10px !important;
-            border: 1.5px solid rgba(99, 102, 241, 0.4) !important;
+            border: 1.5px solid {border_color} !important;
             color: {text_color} !important;
         }}
 
@@ -125,7 +151,6 @@ def normalizar_texto(texto):
     texto_str = str(texto).strip().upper()
     nfkd_form = unicodedata.normalize('NFKD', texto_str)
     return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
-
 
 # --- 2. CONEXIÓN Y CARGA CON CACHÉ ---
 @st.cache_resource
@@ -278,14 +303,6 @@ def obtener_jornada_actual():
             return j
     return "J17"
 
-# --- BARRA LATERAL ---
-st.sidebar.image("assets/logo_liga.png", width=380)
-st.sidebar.markdown("""
-    <div style="background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%); padding: 10px 15px; border-radius: 10px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);">
-        <span style="color: #ffffff; font-weight: 900; font-size: 1.1rem; letter-spacing: 1px;">⚡ PANEL ADMINISTRADOR</span>
-    </div>
-""", unsafe_allow_html=True)
-
 jornada_automatica = obtener_jornada_actual()
 st.sidebar.markdown(f"📅 **Fecha:** `{datetime.now().strftime('%d/%m/%Y')}`")
 st.sidebar.markdown(f"⚽ **Jornada Sugerida:** `{jornada_automatica}`")
@@ -294,7 +311,7 @@ st.sidebar.markdown("---")
 # =========================================================================
 # PANEL DE CONTROL PRINCIPAL (ADMIN)
 # =========================================================================
-st.markdown("<h2 style='color: #a855f7; text-transform: uppercase;'>⚙ Panel de Control del Administrador</h2>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-transform: uppercase;'>⚙ Panel de Control del Administrador</h2>", unsafe_allow_html=True)
 
 default_index = LISTA_JORNADAS.index(jornada_automatica) if jornada_automatica in LISTA_JORNADAS else 0
 jornada_sel = st.selectbox("Selecciona la jornada a gestionar:", LISTA_JORNADAS, index=default_index)
