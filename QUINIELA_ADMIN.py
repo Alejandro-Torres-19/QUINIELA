@@ -14,108 +14,107 @@ st.set_page_config(
     layout="wide",
 )
 
-# --- ESTILOS CSS VIBRANTES Y MODERNOS (INDEPENDIENTE DEL MODO DEL NAVEGADOR) ---
-st.markdown("""
+# --- SELECTOR MANUAL DE MODO EN LA BARRA LATERAL ---
+st.sidebar.image("assets/logo_liga.png", width=380)
+st.sidebar.markdown("""
+    <div style="background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%); padding: 10px 15px; border-radius: 10px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);">
+        <span style="color: #ffffff; font-weight: 900; font-size: 1.1rem; letter-spacing: 1px;">⚡ PANEL ADMINISTRADOR</span>
+    </div>
+""", unsafe_allow_html=True)
+
+# Selector visual manual para el usuario
+modo_visual = st.sidebar.radio("🎨 Tema Visual de la App:", ["🌙 Oscuro (Default)", "☀️ Claro"], horizontal=True)
+is_dark = "Oscuro" in modo_visual
+
+# --- DEFINICIÓN DE COLORES SEGÚN EL MODO SELECCIONADO ---
+if is_dark:
+    bg_app = "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)"
+    text_color = "#f8fafc"
+    card_bg = "rgba(15, 23, 42, 0.8)"
+    input_bg = "#1e293b"
+    tab_text = "#ffffff"
+    sidebar_bg = "linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%)"
+else:
+    bg_app = "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%)"
+    text_color = "#0f172a"
+    card_bg = "rgba(255, 255, 255, 0.9)"
+    input_bg = "#ffffff"
+    tab_text = "#1e1b4b"
+    sidebar_bg = "linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%)"
+
+# --- ESTILOS CSS DINÁMICOS DEPENDIENTES DEL SELECTOR ---
+st.markdown(f"""
     <style>
-        /* Forzar esquema de color oscuro absoluto a nivel de navegador */
-        :root {
-            color-scheme: dark;
-        }
+        /* Fondo general de la aplicación */
+        .stApp {{
+            background: {bg_app} !important;
+            color: {text_color} !important;
+        }}
 
-        /* Fondo general de la aplicación independiente del sistema */
-        .stApp {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
-            color: #f8fafc !important;
-        }
-
-        /* Expandir el ancho de la barra lateral y darle color llamativo */
-        [data-testid="stSidebar"] {
+        /* Barra lateral */
+        [data-testid="stSidebar"] {{
             min-width: 320px !important;
             max-width: 320px !important;
-            background: linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%) !important;
+            background: {sidebar_bg} !important;
             border-right: 2px solid rgba(99, 102, 241, 0.3);
-        }
+        }}
 
-        /* CORRECCIÓN ABSOLUTA DE CAMPOS (Selectbox / Menú desplegable) */
+        /* Campos Selectbox */
         div[data-baseweb="select"] > div, 
-        .stSelectbox div[data-baseweb="select"] {
-            background-color: #1e293b !important;
-            color: #ffffff !important;
+        .stSelectbox div[data-baseweb="select"] {{
+            background-color: {input_bg} !important;
+            color: {text_color} !important;
             border: 1.5px solid #6366f1 !important;
             border-radius: 10px !important;
-        }
+        }}
 
-        /* Color de las opciones dentro del menú desplegable al abrirlo */
-        div[data-baseweb="menu"], ul[data-baseweb="menu"], li[data-baseweb="option"] {
-            background-color: #1e293b !important;
-            color: #ffffff !important;
-        }
+        div[data-baseweb="menu"], ul[data-baseweb="menu"], li[data-baseweb="option"] {{
+            background-color: {input_bg} !important;
+            color: {text_color} !important;
+        }}
 
-        /* Estilo de pestañas (Tabs) independientes del modo claro/oscuro */
-        .stTabs [data-baseweb="tab-list"] {
+        /* Pestañas (Tabs) y sus textos visibles */
+        .stTabs [data-baseweb="tab-list"] {{
             gap: 8px;
-            background-color: rgba(30, 27, 75, 0.5) !important;
+            background-color: rgba(30, 27, 75, 0.2);
             padding: 10px;
             border-radius: 16px;
             border: 1px solid rgba(99, 102, 241, 0.2);
-        }
+        }}
         
-        .stTabs [data-baseweb="tab"] {
-            background-color: rgba(15, 23, 42, 0.8) !important;
+        .stTabs [data-baseweb="tab"] {{
+            background-color: {card_bg} !important;
             border-radius: 10px;
             padding: 12px 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
-        }
+        }}
 
-        .stTabs [data-baseweb="tab"]:hover {
+        .stTabs [data-baseweb="tab"]:hover {{
             background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%) !important;
-            border-color: #a855f7;
-        }
+        }}
 
-        /* FORZAR TEXTO BLANCO BRILLANTE EN LOS TÍTULOS DE LAS PESTAÑAS */
+        /* FORZAR TEXTO CLARO/OSCURO EN LAS PESTAÑAS SEGÚN EL MODO */
         .stTabs [data-baseweb="tab"] p, 
         .stTabs [data-baseweb="tab"] span,
-        .stTabs div[data-baseweb="tab"] div {
-            font-size: 1.15rem !important;
+        .stTabs div[data-baseweb="tab"] div {{
+            font-size: 1.1rem !important;
             font-weight: 800 !important;
-            color: #ffffff !important;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-        }
+            color: {tab_text} !important;
+        }}
 
-        /* Botones principales llamativos con degradado */
-        div.stButton > button[kind="primary"] {
-            background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%) !important;
-            color: white !important;
-            font-size: 1.15rem !important;
-            font-weight: 800 !important;
-            padding: 0.75rem 1.5rem !important;
-            border-radius: 12px !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        div.stButton > button[kind="primary"]:hover {
-            background: linear-gradient(135deg, #4f46e5 0%, #db2777 100%) !important;
-            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.6);
-            transform: translateY(-2px);
-        }
-
-        /* Inputs de texto independientes del navegador */
-        .stTextInput input {
-            background-color: #1e293b !important;
+        /* Inputs de texto */
+        .stTextInput input {{
+            background-color: {input_bg} !important;
             border-radius: 10px !important;
             border: 1.5px solid rgba(99, 102, 241, 0.4) !important;
-            color: #ffffff !important;
-        }
+            color: {text_color} !important;
+        }}
 
-        /* Encabezados y títulos con efecto brillante */
-        h2, h3 {
+        h2, h3 {{
+            color: {text_color} !important;
             font-weight: 900 !important;
-            letter-spacing: 0.5px;
-            text-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
-        }
+        }}
     </style>
 """, unsafe_allow_html=True)
 
