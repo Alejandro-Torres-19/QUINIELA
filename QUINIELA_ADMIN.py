@@ -14,13 +14,18 @@ st.set_page_config(
     layout="wide",
 )
 
-# --- ESTILOS CSS VIBRANTES Y MODERNOS (CORRECCIÓN DE PESTAÑAS Y SELECTBOX) ---
+# --- ESTILOS CSS VIBRANTES Y MODERNOS (INDEPENDIENTE DEL MODO DEL NAVEGADOR) ---
 st.markdown("""
     <style>
-        /* Fondo general de la aplicación */
+        /* Forzar esquema de color oscuro absoluto a nivel de navegador */
+        :root {
+            color-scheme: dark;
+        }
+
+        /* Fondo general de la aplicación independiente del sistema */
         .stApp {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-            color: #f8fafc;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
+            color: #f8fafc !important;
         }
 
         /* Expandir el ancho de la barra lateral y darle color llamativo */
@@ -31,7 +36,7 @@ st.markdown("""
             border-right: 2px solid rgba(99, 102, 241, 0.3);
         }
 
-        /* CORRECCIÓN DE CAMPOS BLANCOS (Selectbox / Menú desplegable) */
+        /* CORRECCIÓN ABSOLUTA DE CAMPOS (Selectbox / Menú desplegable) */
         div[data-baseweb="select"] > div, 
         .stSelectbox div[data-baseweb="select"] {
             background-color: #1e293b !important;
@@ -46,17 +51,17 @@ st.markdown("""
             color: #ffffff !important;
         }
 
-        /* Estilo de pestañas (Tabs) grandes, coloridas y texto blanco visible */
+        /* Estilo de pestañas (Tabs) independientes del modo claro/oscuro */
         .stTabs [data-baseweb="tab-list"] {
             gap: 8px;
-            background-color: rgba(30, 27, 75, 0.5);
+            background-color: rgba(30, 27, 75, 0.5) !important;
             padding: 10px;
             border-radius: 16px;
             border: 1px solid rgba(99, 102, 241, 0.2);
         }
         
         .stTabs [data-baseweb="tab"] {
-            background-color: rgba(15, 23, 42, 0.8);
+            background-color: rgba(15, 23, 42, 0.8) !important;
             border-radius: 10px;
             padding: 12px 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -64,7 +69,7 @@ st.markdown("""
         }
 
         .stTabs [data-baseweb="tab"]:hover {
-            background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+            background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%) !important;
             border-color: #a855f7;
         }
 
@@ -97,7 +102,7 @@ st.markdown("""
             transform: translateY(-2px);
         }
 
-        /* Inputs de texto */
+        /* Inputs de texto independientes del navegador */
         .stTextInput input {
             background-color: #1e293b !important;
             border-radius: 10px !important;
@@ -113,7 +118,6 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
-
 
 # --- FUNCIÓN DE NORMALIZACIÓN DE TEXTO ---
 def normalizar_texto(texto):
