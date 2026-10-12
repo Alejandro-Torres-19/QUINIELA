@@ -14,7 +14,7 @@ st.set_page_config(
     layout="wide",
 )
 
-# --- ESTILOS CSS VIBRANTES Y MODERNOS (TIPO DASHBOARD DEPORTIVO) ---
+# --- ESTILOS CSS VIBRANTES Y MODERNOS (CON CORRECCIÓN DE SELECTBOX BLANCO) ---
 st.markdown("""
     <style>
         /* Fondo general de la aplicación */
@@ -31,6 +31,29 @@ st.markdown("""
             border-right: 2px solid rgba(99, 102, 241, 0.3);
         }
 
+        /* CORRECCIÓN DE CAMPOS BLANCOS (Selectbox / Menú desplegable) */
+        div[data-baseweb="select"] > div, 
+        .stSelectbox div[data-baseweb="select"] {
+            background-color: #1e293b !important;
+            color: #ffffff !important;
+            border: 1.5px solid #6366f1 !important;
+            border-radius: 10px !important;
+        }
+
+        /* Color de las opciones dentro del menú desplegable al abrirlo */
+        div[data-baseweb="menu"], ul[data-baseweb="menu"], li[data-baseweb="option"] {
+            background-color: #1e293b !important;
+            color: #ffffff !important;
+        }
+
+        /* Color de las etiquetas de texto/badges en la barra lateral */
+        div[data-testid="stSidebar"] code, 
+        [data-testid="stMarkdownContainer"] code {
+            background-color: #1e1b4b !important;
+            color: #c084fc !important;
+            border: 1px solid #6366f1 !important;
+        }
+
         /* Estilo de pestañas (Tabs) grandes, coloridas y con efecto glow */
         .stTabs [data-baseweb="tab-list"] {
             gap: 8px;
@@ -39,7 +62,7 @@ st.markdown("""
             border-radius: 16px;
             border: 1px solid rgba(99, 102, 241, 0.2);
         }
-
+        
         .stTabs [data-baseweb="tab"] {
             background-color: rgba(15, 23, 42, 0.6);
             border-radius: 10px;
@@ -78,9 +101,9 @@ st.markdown("""
             transform: translateY(-2px);
         }
 
-        /* Selectboxes e Inputs personalizados */
-        .stSelectbox div[data-baseweb="select"], .stTextInput input {
-            background-color: rgba(30, 41, 59, 0.7) !important;
+        /* Inputs de texto */
+        .stTextInput input {
+            background-color: #1e293b !important;
             border-radius: 10px !important;
             border: 1.5px solid rgba(99, 102, 241, 0.4) !important;
             color: #ffffff !important;
@@ -122,7 +145,6 @@ def conectar_google_sheets():
         st.error(f"Error crítico en conexión Google Sheets: {e}")
         return None
 
-
 @st.cache_data(ttl=600)
 def obtener_datos_jornada_cache(jornada_nombre):
     spreadsheet = conectar_google_sheets()
@@ -133,7 +155,6 @@ def obtener_datos_jornada_cache(jornada_nombre):
         return sheet_j.get_all_values()
     except Exception:
         return []
-
 
 spreadsheet = conectar_google_sheets()
 
@@ -248,7 +269,6 @@ PARTIDOS_OFICIALES_APERTURA_2026 = {
 
 LISTA_JORNADAS = [f"J{i}" for i in range(1, 18)]
 
-
 def obtener_jornada_actual():
     hoy = date.today()
     for j, (f_inicio, f_fin) in CALENDARIO_JORNADAS.items():
@@ -258,7 +278,6 @@ def obtener_jornada_actual():
         if hoy < f_inicio:
             return j
     return "J17"
-
 
 # --- BARRA LATERAL ---
 st.sidebar.image("assets/logo_liga.png", width=380)
@@ -276,8 +295,7 @@ st.sidebar.markdown("---")
 # =========================================================================
 # PANEL DE CONTROL PRINCIPAL (ADMIN)
 # =========================================================================
-st.markdown("<h2 style='color: #a855f7; text-transform: uppercase;'>⚙ Panel de Control del Administrador</h2>",
-            unsafe_allow_html=True)
+st.markdown("<h2 style='color: #a855f7; text-transform: uppercase;'>⚙ Panel de Control del Administrador</h2>", unsafe_allow_html=True)
 
 default_index = LISTA_JORNADAS.index(jornada_automatica) if jornada_automatica in LISTA_JORNADAS else 0
 jornada_sel = st.selectbox("Selecciona la jornada a gestionar:", LISTA_JORNADAS, index=default_index)
@@ -286,11 +304,11 @@ st.markdown("---")
 
 # PESTAÑAS DE GESTIÓN
 tab_tabla_sem, tab_premio, tab_participantes, tab_pronosticos, tab_resultados, tab_partidos = st.tabs([
-    "🏆 Puntos de la Semana",
-    "💰 Gestionar Premio",
+    "🏆 Puntos de la Semana", 
+    "💰 Gestionar Premio", 
     "👥 Participantes",
-    "📝 Pronósticos",
-    "⚽ Resultados",
+    "📝 Pronósticos", 
+    "⚽ Resultados", 
     "🛠 Modificar Partidos"
 ])
 
@@ -298,7 +316,7 @@ tab_tabla_sem, tab_premio, tab_participantes, tab_pronosticos, tab_resultados, t
 with tab_tabla_sem:
     st.markdown(f"#### Clasificación Semanal - {jornada_sel}")
     rows_j = obtener_datos_jornada_cache(jornada_sel.upper())
-
+    
     if rows_j and len(rows_j) >= 4:
         bolsa_texto = "PREMIO $0"
         for val_c in rows_j[1]:
@@ -316,13 +334,11 @@ with tab_tabla_sem:
             if not r: continue
             if len(r) > 1 and str(r[1]).strip() != "" and str(r[1]).strip().upper() != "NOMBRE":
                 nombre_p = str(r[1]).strip()
-                pts_p = int(float(str(r[21]).strip())) if len(r) > 21 and str(r[21]).strip().replace('.', '',
-                                                                                                     1).isdigit() else 0
+                pts_p = int(float(str(r[21]).strip())) if len(r) > 21 and str(r[21]).strip().replace('.', '', 1).isdigit() else 0
                 tabla_semanal_data.append({"Participante": nombre_p, "Puntos": pts_p})
             if len(r) > 23 and str(r[23]).strip() != "" and str(r[23]).strip().upper() != "NOMBRE":
                 nombre_p = str(r[23]).strip()
-                pts_p = int(float(str(r[43]).strip())) if len(r) > 43 and str(r[43]).strip().replace('.', '',
-                                                                                                     1).isdigit() else 0
+                pts_p = int(float(str(r[43]).strip())) if len(r) > 43 and str(r[43]).strip().replace('.', '', 1).isdigit() else 0
                 tabla_semanal_data.append({"Participante": nombre_p, "Puntos": pts_p})
 
         if tabla_semanal_data:
@@ -362,7 +378,7 @@ with tab_tabla_sem:
             for idx, row in df_sem.iterrows():
                 is_first = (idx == 0 or row["Puntos"] == max_pts) and max_pts > 0
                 row_cls = "lb-admin-row lb-admin-gold" if is_first else "lb-admin-row"
-
+                
                 if idx == 0:
                     rank_str = "🥇 #1"
                 elif idx == 1:
@@ -417,23 +433,20 @@ with tab_participantes:
 
     rows_j = obtener_datos_jornada_cache(jornada_sel.upper())
     participantes_activos = []
-
+    
     if rows_j:
         for r_idx, r in enumerate(rows_j):
             if not r: continue
-            if len(r) > 1 and str(r[1]).strip() != "" and str(r[1]).strip().upper() not in ["NOMBRE", "PARTICIPANTE",
-                                                                                            "TOTAL", "PUNTOS"]:
+            if len(r) > 1 and str(r[1]).strip() != "" and str(r[1]).strip().upper() not in ["NOMBRE", "PARTICIPANTE", "TOTAL", "PUNTOS"]:
                 participantes_activos.append({"nombre": str(r[1]).strip(), "fila": r_idx + 1, "col_nombre": 2})
-            if len(r) > 23 and str(r[23]).strip() != "" and str(r[23]).strip().upper() not in ["NOMBRE", "PARTICIPANTE",
-                                                                                               "TOTAL", "PUNTOS"]:
+            if len(r) > 23 and str(r[23]).strip() != "" and str(r[23]).strip().upper() not in ["NOMBRE", "PARTICIPANTE", "TOTAL", "PUNTOS"]:
                 participantes_activos.append({"nombre": str(r[23]).strip(), "fila": r_idx + 1, "col_nombre": 24})
 
     col_add, col_del = st.columns(2, gap="large")
 
     with col_add:
         st.markdown("##### ➕ Agregar Nuevo Participante")
-        nuevo_p_input = st.text_input("Nombre del nuevo participante:",
-                                      key=f"input_nuevo_participante_{jornada_sel}").strip().upper()
+        nuevo_p_input = st.text_input("Nombre del nuevo participante:", key=f"input_nuevo_participante_{jornada_sel}").strip().upper()
         if st.button("Registrar Nuevo Participante", type="primary", key=f"btn_add_{jornada_sel}"):
             if nuevo_p_input:
                 spreadsheet = conectar_google_sheets()
@@ -442,7 +455,7 @@ with tab_participantes:
                         sheet_j = spreadsheet.worksheet(jornada_sel.upper())
                         current_rows = sheet_j.get_all_values()
                         row_to_use = -1
-
+                        
                         for r_idx in range(136, 166):
                             val_x = ""
                             if r_idx < len(current_rows) and len(current_rows[r_idx]) > 23:
@@ -458,7 +471,7 @@ with tab_participantes:
                                 val_prev = str(current_rows[fila_modelo - 1][22]).strip()
                                 if val_prev.isdigit():
                                     numero_anterior = int(val_prev)
-
+                            
                             siguiente_numero = numero_anterior + 1 if numero_anterior > 0 else 1
 
                             rango_modelo = sheet_j.range(f"W{fila_modelo}:ZZ{fila_modelo}")
@@ -480,13 +493,12 @@ with tab_participantes:
 
                             sheet_j.update_acell(f'W{row_to_use}', siguiente_numero)
                             sheet_j.update_acell(f'X{row_to_use}', nuevo_p_input)
-
+                            
                             formula_ar = f"=SUMA(AA{row_to_use},AC{row_to_use},AE{row_to_use},AG{row_to_use},AI{row_to_use},AK{row_to_use},AM{row_to_use},AO{row_to_use},AQ{row_to_use})"
                             sheet_j.update_acell(f'AR{row_to_use}', formula_ar)
-
+                            
                             st.cache_data.clear()
-                            st.success(
-                                f"✅ ¡Se agregó a '{nuevo_p_input}' con ID {siguiente_numero} en la fila {row_to_use} y su fórmula aplicada!")
+                            st.success(f"✅ ¡Se agregó a '{nuevo_p_input}' con ID {siguiente_numero} en la fila {row_to_use} y su fórmula aplicada!")
                             st.balloons()
                             st.rerun()
                         else:
@@ -500,9 +512,8 @@ with tab_participantes:
         st.markdown("##### ➖ Eliminar Participante")
         if participantes_activos:
             nombres_activos_list = [p["nombre"] for p in participantes_activos]
-            p_a_eliminar = st.selectbox("Selecciona al participante a eliminar:", nombres_activos_list,
-                                        key=f"select_eliminar_participante_{jornada_sel}")
-
+            p_a_eliminar = st.selectbox("Selecciona al participante a eliminar:", nombres_activos_list, key=f"select_eliminar_participante_{jornada_sel}")
+            
             if st.button("Eliminar Participante Seleccionado", type="secondary", key=f"btn_del_{jornada_sel}"):
                 spreadsheet = conectar_google_sheets()
                 if spreadsheet:
@@ -512,7 +523,7 @@ with tab_participantes:
                         if p_info:
                             fila_del = p_info["fila"]
                             col_del_idx = p_info["col_nombre"]
-
+                            
                             indices_a_limpiar = range(col_del_idx - 1, col_del_idx + 21)
                             for c_idx in indices_a_limpiar:
                                 col_letra_limpiar = gspread.utils.rowcol_to_a1(1, c_idx + 1).replace('1', '')
@@ -532,41 +543,33 @@ with tab_participantes:
 with tab_pronosticos:
     st.markdown(f"#### Captura o Edición de Pronósticos - {jornada_sel}")
     rows_j = obtener_datos_jornada_cache(jornada_sel.upper())
-
+    
     if rows_j and len(rows_j) >= 4:
-        participantes_map = {}
+        participantes_map = {} 
         for r_idx, r in enumerate(rows_j):
             if not r: continue
-            if len(r) > 1 and str(r[1]).strip() != "" and str(r[1]).strip().upper() not in ["NOMBRE", "PARTICIPANTE",
-                                                                                            "TOTAL", "PUNTOS"]:
+            if len(r) > 1 and str(r[1]).strip() != "" and str(r[1]).strip().upper() not in ["NOMBRE", "PARTICIPANTE", "TOTAL", "PUNTOS"]:
                 nom_izq = str(r[1]).strip()
-                participantes_map[nom_izq.upper()] = {"nombre": nom_izq, "fila": r_idx + 1, "col_nombre": 2,
-                                                      "bloque": "izq"}
-            if len(r) > 23 and str(r[23]).strip() != "" and str(r[23]).strip().upper() not in ["NOMBRE", "PARTICIPANTE",
-                                                                                               "TOTAL", "PUNTOS"]:
+                participantes_map[nom_izq.upper()] = {"nombre": nom_izq, "fila": r_idx + 1, "col_nombre": 2, "bloque": "izq"}
+            if len(r) > 23 and str(r[23]).strip() != "" and str(r[23]).strip().upper() not in ["NOMBRE", "PARTICIPANTE", "TOTAL", "PUNTOS"]:
                 nom_der = str(r[23]).strip()
-                participantes_map[nom_der.upper()] = {"nombre": nom_der, "fila": r_idx + 1, "col_nombre": 24,
-                                                      "bloque": "der"}
+                participantes_map[nom_der.upper()] = {"nombre": nom_der, "fila": r_idx + 1, "col_nombre": 24, "bloque": "der"}
 
         nombres_ordenados = sorted(list(participantes_map.keys()))
 
-        busqueda_input = st.text_input("🔍 Escribe el nombre del participante a buscar:",
-                                       key=f"busqueda_pron_{jornada_sel}").strip().upper()
+        busqueda_input = st.text_input("🔍 Escribe el nombre del participante a buscar:", key=f"busqueda_pron_{jornada_sel}").strip().upper()
         coincidencias = [n for n in nombres_ordenados if busqueda_input in n] if busqueda_input else nombres_ordenados
 
         if len(coincidencias) > 0:
-            participante_seleccionado = st.selectbox("Selecciona de la lista de coincidencias:", coincidencias,
-                                                     key=f"sel_pron_{jornada_sel}")
+            participante_seleccionado = st.selectbox("Selecciona de la lista de coincidencias:", coincidencias, key=f"sel_pron_{jornada_sel}")
         else:
             participante_seleccionado = "NUEVO"
 
-        exactamente_existe = (busqueda_input in nombres_ordenados) or (
-                    participante_seleccionado in nombres_ordenados and busqueda_input == participante_seleccionado)
+        exactamente_existe = (busqueda_input in nombres_ordenados) or (participante_seleccionado in nombres_ordenados and busqueda_input == participante_seleccionado)
 
         if busqueda_input and not exactamente_existe:
             st.warning(f"⚠️ El participante **'{busqueda_input}'** no está registrado en esta jornada.")
-            if st.button(f"➕ Agregar a '{busqueda_input}' a la {jornada_sel}", type="primary",
-                         key=f"btn_add_pron_{jornada_sel}"):
+            if st.button(f"➕ Agregar a '{busqueda_input}' a la {jornada_sel}", type="primary", key=f"btn_add_pron_{jornada_sel}"):
                 spreadsheet = conectar_google_sheets()
                 if spreadsheet:
                     try:
@@ -588,7 +591,7 @@ with tab_pronosticos:
                                 val_prev = str(current_rows[fila_modelo - 1][22]).strip()
                                 if val_prev.isdigit():
                                     numero_anterior = int(val_prev)
-
+                            
                             siguiente_numero = numero_anterior + 1 if numero_anterior > 0 else 1
 
                             rango_modelo = sheet_j.range(f"W{fila_modelo}:ZZ{fila_modelo}")
@@ -610,10 +613,10 @@ with tab_pronosticos:
 
                             sheet_j.update_acell(f'W{row_to_use}', siguiente_numero)
                             sheet_j.update_acell(f'X{row_to_use}', busqueda_input)
-
+                            
                             formula_ar = f"=SUMA(AA{row_to_use},AC{row_to_use},AE{row_to_use},AG{row_to_use},AI{row_to_use},AK{row_to_use},AM{row_to_use},AO{row_to_use},AQ{row_to_use})"
                             sheet_j.update_acell(f'AR{row_to_use}', formula_ar)
-
+                            
                             st.cache_data.clear()
                             st.success(f"✅ ¡Se agregó con éxito al participante '{busqueda_input}' con su fórmula!")
                             st.balloons()
@@ -622,17 +625,16 @@ with tab_pronosticos:
                             st.error("No hay espacio disponible en el bloque derecho (X137:X166).")
                     except Exception as e:
                         st.error(f"Error al agregar participante: {e}")
-
+        
         if participante_seleccionado and participante_seleccionado != "NUEVO" and participante_seleccionado in participantes_map:
             info_p = participantes_map[participante_seleccionado]
             fila_idx = info_p["fila"] - 1
             es_izq = (info_p["bloque"] == "izq")
             indices_pronosticos = [3, 5, 7, 9, 11, 13, 15, 17, 19] if es_izq else [25, 27, 29, 31, 33, 35, 37, 39, 41]
 
-            st.markdown(
-                f"Editando pronósticos de: **{info_p['nombre']}** (Bloque {'Izquierdo' if es_izq else 'Derecho'})")
+            st.markdown(f"Editando pronósticos de: **{info_p['nombre']}** (Bloque {'Izquierdo' if es_izq else 'Derecho'})")
 
-            enfrentamientos = [f"Partido {i + 1}" for i in range(9)]
+            enfrentamientos = [f"Partido {i+1}" for i in range(9)]
             try:
                 for i in range(9):
                     fila_local = 4 + (i * 4)
@@ -655,14 +657,12 @@ with tab_pronosticos:
             with st.form(key=f"form_pronosticos_{info_p['nombre']}_{jornada_sel}"):
                 nuevos_pronosticos = []
                 cols_form = st.columns(3)
-
+                
                 opciones_validas = ["L", "E", "V"]
                 for i in range(9):
-                    idx_default = opciones_validas.index(pronosticos_actuales[i]) if pronosticos_actuales[
-                                                                                         i] in opciones_validas else 0
+                    idx_default = opciones_validas.index(pronosticos_actuales[i]) if pronosticos_actuales[i] in opciones_validas else 0
                     with cols_form[i % 3]:
-                        val_sel = st.selectbox(f"Juego {i + 1}: {enfrentamientos[i]}", opciones_validas,
-                                               index=idx_default, key=f"p_{i}_{info_p['nombre']}_{jornada_sel}")
+                        val_sel = st.selectbox(f"Juego {i+1}: {enfrentamientos[i]}", opciones_validas, index=idx_default, key=f"p_{i}_{info_p['nombre']}_{jornada_sel}")
                         nuevos_pronosticos.append(val_sel)
 
                 submit_btn = st.form_submit_button("💾 Guardar Pronósticos en Google Sheets", type="primary")
@@ -678,8 +678,7 @@ with tab_pronosticos:
                                 sheet_j.update_acell(celda_exacta, nuevos_pronosticos[i])
 
                             st.cache_data.clear()
-                            st.success(
-                                f"✅ ¡Pronósticos de {info_p['nombre']} actualizados correctamente en Google Sheets!")
+                            st.success(f"✅ ¡Pronósticos de {info_p['nombre']} actualizados correctamente en Google Sheets!")
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error al guardar pronósticos: {e}")
@@ -687,14 +686,13 @@ with tab_pronosticos:
 # --- SECCIÓN: RESULTADOS DE PARTIDOS ---
 with tab_resultados:
     st.markdown(f"#### Captura de Resultados Oficiales - {jornada_sel}")
-    st.info(
-        "Selecciona el resultado oficial (L = Local, E = Empate, V = Visitante) para cada partido de la jornada. Esto actualizará el puntaje de todos los participantes automáticamente.")
+    st.info("Selecciona el resultado oficial (L = Local, E = Empate, V = Visitante) para cada partido de la jornada. Esto actualizará el puntaje de todos los participantes automáticamente.")
 
     rows_j = obtener_datos_jornada_cache(jornada_sel.upper())
 
     if rows_j and len(rows_j) >= 4:
-        enfrentamientos = [f"Partido {i + 1}" for i in range(9)]
-        celdas_resultados = []
+        enfrentamientos = [f"Partido {i+1}" for i in range(9)]
+        celdas_resultados = [] 
         resultados_actuales = []
 
         try:
@@ -705,12 +703,10 @@ with tab_resultados:
 
                 fila_local = 4 + (i * 4)
                 fila_visitante = 5 + (i * 4)
-
-                loc_t = str(rows_j[fila_local - 1][44]).strip() if (fila_local - 1) < len(rows_j) and len(
-                    rows_j[fila_local - 1]) > 44 else ""
-                vis_t = str(rows_j[fila_visitante - 1][44]).strip() if (fila_visitante - 1) < len(rows_j) and len(
-                    rows_j[fila_visitante - 1]) > 44 else ""
-
+                
+                loc_t = str(rows_j[fila_local - 1][44]).strip() if (fila_local - 1) < len(rows_j) and len(rows_j[fila_local - 1]) > 44 else ""
+                vis_t = str(rows_j[fila_visitante - 1][44]).strip() if (fila_visitante - 1) < len(rows_j) and len(rows_j[fila_visitante - 1]) > 44 else ""
+                
                 if loc_t and vis_t:
                     enfrentamientos[i] = f"{loc_t} vs {vis_t}"
 
@@ -718,7 +714,7 @@ with tab_resultados:
                 idx_res_0 = fila_res - 1
                 if idx_res_0 < len(rows_j) and len(rows_j[idx_res_0]) > 47:
                     res_val = str(rows_j[idx_res_0][47]).strip().upper()
-
+                
                 if res_val not in ["L", "E", "V"]:
                     res_val = "L"
                 resultados_actuales.append(res_val)
@@ -734,8 +730,7 @@ with tab_resultados:
             for i in range(9):
                 idx_def = opciones_res.index(resultados_actuales[i]) if resultados_actuales[i] in opciones_res else 0
                 with cols_res[i % 3]:
-                    res_sel = st.selectbox(f"Partido {i + 1}: {enfrentamientos[i]}", opciones_res, index=idx_def,
-                                           key=f"res_oficial_{i}_{jornada_sel}")
+                    res_sel = st.selectbox(f"Partido {i+1}: {enfrentamientos[i]}", opciones_res, index=idx_def, key=f"res_oficial_{i}_{jornada_sel}")
                     nuevos_resultados.append(res_sel)
 
             submit_res_btn = st.form_submit_button("💾 Guardar Resultados Oficiales en Google Sheets", type="primary")
@@ -758,8 +753,7 @@ with tab_resultados:
 # --- SECCIÓN: MODIFICAR PARTIDOS ---
 with tab_partidos:
     st.markdown(f"#### 🛠 Modificar Enfrentamientos / Equipos - {jornada_sel}")
-    st.info(
-        "Actualiza los nombres de los equipos Local y Visitante para cada uno de los 9 partidos de la jornada o cárgalos automáticamente con el calendario oficial.")
+    st.info("Actualiza los nombres de los equipos Local y Visitante para cada uno de los 9 partidos de la jornada o cárgalos automáticamente con el calendario oficial.")
 
     st.markdown("""
         <style>
@@ -781,25 +775,23 @@ with tab_partidos:
         </style>
     """, unsafe_allow_html=True)
 
-    if st.button(f"📥 CARGAR PARTIDOS OFICIALES DE {jornada_sel.upper()}", type="secondary",
-                 key=f"btn_autocargar_{jornada_sel}"):
+    if st.button(f"📥 CARGAR PARTIDOS OFICIALES DE {jornada_sel.upper()}", type="secondary", key=f"btn_autocargar_{jornada_sel}"):
         if jornada_sel in PARTIDOS_OFICIALES_APERTURA_2026:
             spreadsheet = conectar_google_sheets()
             if spreadsheet:
                 try:
                     sheet_j = spreadsheet.worksheet(jornada_sel.upper())
                     partidos_oficiales = PARTIDOS_OFICIALES_APERTURA_2026[jornada_sel]
-
+                    
                     for i, (loc, vis) in enumerate(partidos_oficiales):
                         fila_local = 4 + (i * 4)
                         fila_visitante = 5 + (i * 4)
-
+                        
                         sheet_j.update_acell(f"AS{fila_local}", loc)
                         sheet_j.update_acell(f"AS{fila_visitante}", vis)
 
                     st.cache_data.clear()
-                    st.success(
-                        f"✅ ¡Partidos oficiales de la {jornada_sel} cargados correctamente en Google Sheets (Columna AS)!")
+                    st.success(f"✅ ¡Partidos oficiales de la {jornada_sel} cargados correctamente en Google Sheets (Columna AS)!")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Error al autocargar partidos: {e}")
@@ -864,13 +856,11 @@ with tab_partidos:
                     col_loc, col_vis = st.columns(2)
                     with col_loc:
                         l_val = "" if p['local'] == "Local por definir" else p['local']
-                        nuevo_local = st.text_input(f"Local - Juego {p['n_partido']}", value=l_val,
-                                                    key=f"loc_{p['n_partido']}_{jornada_sel}")
+                        nuevo_local = st.text_input(f"Local - Juego {p['n_partido']}", value=l_val, key=f"loc_{p['n_partido']}_{jornada_sel}")
                     with col_vis:
                         v_val = "" if p['visitante'] == "Visitante por definir" else p['visitante']
-                        nuevo_visitante = st.text_input(f"Visitante - Juego {p['n_partido']}", value=v_val,
-                                                        key=f"vis_{p['n_partido']}_{jornada_sel}")
-
+                        nuevo_visitante = st.text_input(f"Visitante - Juego {p['n_partido']}", value=v_val, key=f"vis_{p['n_partido']}_{jornada_sel}")
+                    
                     nuevos_equipos.append({
                         "fila_local": p['fila_local'],
                         "local": nuevo_local.strip().upper(),
@@ -879,8 +869,7 @@ with tab_partidos:
                     })
                     st.markdown("---")
 
-                submit_partidos_btn = st.form_submit_button("💾 Guardar Cambios de Partidos en Google Sheets",
-                                                            type="primary")
+                submit_partidos_btn = st.form_submit_button("💾 Guardar Cambios de Partidos en Google Sheets", type="primary")
                 if submit_partidos_btn:
                     spreadsheet = conectar_google_sheets()
                     if spreadsheet:
@@ -891,8 +880,7 @@ with tab_partidos:
                                 sheet_j.update_acell(f"AS{item['fila_visitante']}", item['visitante'])
 
                             st.cache_data.clear()
-                            st.success(
-                                "✅ ¡Los enfrentamientos y nombres de equipos se actualizaron correctamente en la columna AS de Google Sheets!")
+                            st.success("✅ ¡Los enfrentamientos y nombres de equipos se actualizaron correctamente en la columna AS de Google Sheets!")
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error al actualizar los partidos en Google Sheets: {e}")
